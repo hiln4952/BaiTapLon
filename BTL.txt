@@ -1,0 +1,139 @@
+#include <stdio.h>
+#include <string.h>
+
+struct sp_st {
+	char tensp[30];
+	int gia, soluong;
+}; 
+
+struct giohang_st {
+	char tenkh[30];
+	char diachi[50];
+	int sosp;
+	sp_st dssp[30];
+};
+
+void Menu(giohang_st &giocuatoi);
+void taoGioHang(giohang_st &giocuatoi);
+void chonHang(giohang_st &giocuatoi);
+void sapXep(giohang_st &giocuatoi);
+void xemChiTietGioHang(giohang_st &giocuatoi);
+void loaiBoMotMatHang(giohang_st &giocuatoi);
+void ghiVaoFile(giohang_st giocuatoi);
+
+int main() {
+	giohang_st giocuatoi;
+	Menu(giocuatoi);
+	return 0;
+}
+void Menu(giohang_st &giocuatoi) {
+	int key;
+	printf("----------------------------[ Menu ]----------------------------\n");
+	printf("--     [ 1 ] = Tao gio hang                                   --\n");
+	printf("--     [ 2 ] = Chon hang                                      --\n");
+	printf("--     [ 3 ] = Xem chi tiet gio hang                          --\n");
+	printf("--     [ 4 ] = Loai bo mot mat hang                           --\n");
+	printf("--     [ 5 ] = Luu noi dung vao file                          --\n");
+	printf("--     [ 6 ] = Thoat                                          --\n");
+	printf("----> Vui long nhap 1 so: ");
+	scanf("%d", &key);
+	while ( key < 0 || key > 6 ) {
+		printf("Nhap sai! ");
+		printf("Vui long nhap 1 so: ");
+		scanf("%d", &key);
+	}
+	switch (key) {
+		case 1:
+			printf("------------------------[ Tao gio hang ]------------------------\n");
+			taoGioHang(giocuatoi);
+			break;
+		case 2:
+			printf("--------------------------[ Chon hang ]-------------------------\n");
+			chonHang(giocuatoi);
+			break;
+		case 3:
+			printf("--------------------[ Xem chi tiet gio hang ]-------------------\n");
+			xemChiTietGioHang(giocuatoi);
+			break;
+		case 4:
+			printf("--------------------[ Loai bo mot mat hang ]--------------------\n");
+			loaiBoMotMatHang(giocuatoi);
+			break;
+		case 5:
+			printf("-------------------[ Luu noi dung vao file ]--------------------\n");
+			ghiVaoFile(giocuatoi);
+			printf("-------> Da luu vao file [cart.dat]\n");
+			break;
+		case 6:
+			printf("-----------------------------[ Thoat ]--------------------------\n");
+			printf("--                    GOODBYE! SEE YOU AGAIN :*               --\n");
+			break;
+	}
+	if (key > 0 && key < 6) Menu(giocuatoi);
+}
+void taoGioHang(giohang_st &giocuatoi) {
+	printf("Nhap ten khach hang: ");
+	fflush(stdin);
+	gets(giocuatoi.tenkh);
+	printf("Nhap dia chi: ");
+	fflush(stdin);
+	gets(giocuatoi.diachi);
+	giocuatoi.sosp = 0;
+}
+void chonHang(giohang_st &giocuatoi) {
+	printf("Nhap ten san pham: ");
+	int x = giocuatoi.sosp;
+	fflush(stdin);
+	gets(giocuatoi.dssp[x].tensp);
+	printf("Nhap so luong: ");
+	scanf("%d", &giocuatoi.dssp[x].soluong);
+	printf("Nhap gia: ");
+	scanf("%d", &giocuatoi.dssp[x].gia);
+	giocuatoi.sosp ++; // sau khi nhap 1 san pham thi so san pham tang len 1
+}
+void xemChiTietGioHang(giohang_st &giocuatoi) {
+	sapXep(giocuatoi);
+	printf("+----------------------------------------------------------------------------------+\n");
+	printf("| STT |                   Ten san pham      |                  Gia      | So luong |\n");
+	for (int i=0; i<giocuatoi.sosp; i++) {
+		printf("+----------------------------------------------------------------------------------+\n");
+		printf("| %3d | %30s      | %20d      | %8d |\n", i+1, giocuatoi.dssp[i].tensp, giocuatoi.dssp[i].gia, giocuatoi.dssp[i].soluong);
+	}
+	printf("+----------------------------------------------------------------------------------+\n");
+}
+void sapXep(giohang_st &giocuatoi) {
+	for (int i=0; i<giocuatoi.sosp; i++)
+		for (int j=0; j<giocuatoi.sosp; j++)
+			if (strcmp(giocuatoi.dssp[i].tensp, giocuatoi.dssp[j].tensp) < 0) {
+				sp_st tmp = giocuatoi.dssp[i];
+				giocuatoi.dssp[i] = giocuatoi.dssp[j];
+				giocuatoi.dssp[j] = tmp;
+			}
+}
+void loaiBoMotMatHang(giohang_st &giocuatoi) {
+	printf("Can loai bo san pham thu may: ");
+	int k;
+	scanf("%d", &k);
+	if (k < 1 || k > giocuatoi.sosp)
+		printf("Ban phai nhap thu tu dung voi danh sach!");
+	else {
+		for (int i=k-1; i<giocuatoi.sosp; i++)
+			giocuatoi.dssp[i] = giocuatoi.dssp[i+1];
+		giocuatoi.sosp--; // Sau khi xoa 1 san pham thi so san pham - 1;
+	}
+}
+void ghiVaoFile(giohang_st giocuatoi) {
+	FILE *fi;
+	fi = fopen("cart.dat", "wt");
+	fprintf(fi, "Ten khach hang: %s\n", giocuatoi.tenkh);
+	fprintf(fi, "Dia chi khach hang: %s\n", giocuatoi.diachi);
+	fprintf(fi, "So luong san pham: %d\n", giocuatoi.sosp);
+	fprintf(fi, "+----------------------------------------------------------------------------------+\n");
+	fprintf(fi, "| STT |                   Ten san pham      |                  Gia      | So luong |\n");
+	for (int i=0; i<giocuatoi.sosp; i++) {
+		fprintf(fi, "+----------------------------------------------------------------------------------+\n");
+		fprintf(fi, "| %3d | %30s      | %20d      | %8d |\n", i+1, giocuatoi.dssp[i].tensp, giocuatoi.dssp[i].gia, giocuatoi.dssp[i].soluong);
+	}
+	fprintf(fi, "+----------------------------------------------------------------------------------+\n");
+	fclose(fi);
+}
